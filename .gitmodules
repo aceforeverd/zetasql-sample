@@ -1,0 +1,3 @@
+[submodule "zetasql"]
+	path = zetasql
+	url = https://github.com/google/zetasql
