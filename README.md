@@ -57,8 +57,6 @@ cmake sampel project integrated zetasql
     -DBUILD_SHARED_LIBS=ON \
     -Dgtest_build_tests=ON \
     -DCMAKE_CXX_FLAGS=-std=c++17
-  ```
-
    pushd build
    make -j$(nproc)
    sudo make install

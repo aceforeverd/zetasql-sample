@@ -31,15 +31,15 @@ list(APPEND ICU_LIBS icui18n icuio icuuc icudata)
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/include
-  /usr/local/include
   ${CMAKE_SOURCE_DIR}zetasql/bazel-bin/bazel/copy_m4/m4/include
   ${CMAKE_SOURCE_DIR}zetasql/bazel-bin/bazel/copy_flex/flex/include
-  ${CMAKE_SOURCE_DIR}zetasql/bazel-bin/external/icu/copy_icu/icu/include)
+  /usr/local/include
+  )
 link_directories(${CMAKE_SOURCE_DIR}/lib
                  /usr/local/lib
-                 ${CMAKE_SOURCE_DIR}/zetasql/bazel-bin/external/icu/copy_icu/icu/lib
                  ${CMAKE_SOURCE_DIR}/lib-external
-                 ${CMAKE_SOURCE_DIR}/zetasql/bazel-bin/bazel/copy_flex/flex/lib)
+                 ${CMAKE_SOURCE_DIR}/zetasql/bazel-bin/bazel/copy_flex/flex/lib
+                 )
 
 add_executable(resolved_ast_test resolved_ast_test.cc)
 target_link_libraries(resolved_ast_test zetasql re2 ${ICU_LIBS} protobuf ${ABSL_LIBS}
