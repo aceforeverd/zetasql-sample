@@ -1,26 +1,46 @@
 cmake_minimum_required(VERSION 3.10)
-SET(CMAKE_CXX_FLAGS "-g -Wall -std=c++17")
+set(CMAKE_CXX_FLAGS "-g -Wall -std=c++17")
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # set the project name
 project(zetasql-sample)
 
+find_package(absl REQUIRED)
+find_package(GTest CONFIG REQUIRED)
+list(
+  APPEND
+  ABSL_LIBS
+  absl::algorithm
+  absl::base
+  absl::debugging
+  absl::flat_hash_map
+  absl::flags
+  absl::flags_parse
+  absl::memory
+  absl::meta
+  absl::numeric
+  absl::random_random
+  absl::strings
+  absl::synchronization
+  absl::time
+  absl::status
+  absl::utility)
+
+list(APPEND ICU_LIBS icui18n icuio icuuc icudata)
+
 include_directories(
-    /usr/local/include
-    include/
-    zetasql/bazel-bin/bazel/copy_m4/m4/include
-    zetasql/bazel-bin/bazel/copy_flex/flex/include
-    zetasql/bazel-bin/bazel/
-    zetasql/bazel-bin/external/icu/copy_icu/icu/include
-)
-
-link_directories(
-    lib
-    /usr/local/lib
-    lib-external
-    zetasql/bazel-bin/bazel/copy_flex/flex/lib
-)
-
+  ${CMAKE_SOURCE_DIR}/include
+  /usr/local/include
+  ${CMAKE_SOURCE_DIR}zetasql/bazel-bin/bazel/copy_m4/m4/include
+  ${CMAKE_SOURCE_DIR}zetasql/bazel-bin/bazel/copy_flex/flex/include
+  ${CMAKE_SOURCE_DIR}zetasql/bazel-bin/external/icu/copy_icu/icu/include)
+link_directories(${CMAKE_SOURCE_DIR}/lib
+                 /usr/local/lib
+                 ${CMAKE_SOURCE_DIR}/zetasql/bazel-bin/external/icu/copy_icu/icu/lib
+                 ${CMAKE_SOURCE_DIR}/lib-external
+                 ${CMAKE_SOURCE_DIR}/zetasql/bazel-bin/bazel/copy_flex/flex/lib)
 
 add_executable(resolved_ast_test resolved_ast_test.cc)
-target_link_libraries(resolved_ast_test zetasql protobuf)
+target_link_libraries(resolved_ast_test zetasql re2 ${ICU_LIBS} protobuf ${ABSL_LIBS}
+                      GTest::gtest GTest::gmock timeofday_proto date_proto)
