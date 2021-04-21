@@ -2,6 +2,20 @@
 
 cmake sampel project integrated zetasql
 
+## Status
+WIP
+
+## Idea
++ the zetasql produce libs for this project. make libs all static may help simpilfy work.
++ zetasql's thirdparty dependencies should managed ourself: cmake.
+
+## Issues
++ bazel compiled protobuf not work, I compiled myself
++ abseil compiled myself, since I'm using `find_package(absl)`
++ there are many shared library dependency in the final binary. checkout `objdump -p $binary | grep NEEDED`
++ some zetasql package do not have archive, only shared library
++ since zetasql compile with c++1z(aka c++17), we should upgrade to c++1z
+
 ## zetasql external dependency management
 
 ### protobuf

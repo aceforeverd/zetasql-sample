@@ -12,7 +12,7 @@ install_lib() {
     local file
     file=$1
     local libname
-    libname=$(echo "$file" | tr '/' '_')
+    libname=lib$(echo "$file" | tr '/' '_' | sed -e 's/lib//')
     install -D "$file" "$ROOT/tmp-lib/$libname"
 }
 
@@ -28,7 +28,7 @@ export -f install_gen_include_file
 export -f install_lib
 
 pushd zetasql/bazel-bin/
-find zetasql -type f -iregex ".*/.*\.\(so\|a\)\$" -exec bash -c 'install_lib $0' {} \;
+find zetasql -maxdepth 4 -type f -iregex ".*/.*\.\(so\|a\)\$" -exec bash -c 'install_lib $0' {} \;
 
 pushd external
 find . -type f -iregex ".*/.*\.\(so\|a\)\$" -exec install -D {} "$ROOT/lib-external" \;
@@ -49,4 +49,6 @@ echo -e "save\nend\n" >> libzetasql.mri
 ar -M <libzetasql.mri
 ranlib libzetasql.a
 mv libzetasql.a lib/
+
+mv tmp-lib/*.so lib/
 

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-set(CMAKE_CXX_FLAGS "-g -Wall -std=c++1z")
+set(CMAKE_CXX_FLAGS "-g -Wall -std=c++1z -Wno-char-subscripts -Wno-return-type -Wno-sign-compare -Wno-switch -Wno-unused-but-set-parameter -Wno-unused-function -Wnonnull-compare")
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # set the project name
@@ -45,6 +45,6 @@ target_link_libraries(resolved_ast_test PUBLIC zetasql re2 ${ICU_LIBS} protobuf 
 
 add_executable(resolver_test ./resolver_test.cc)
 target_link_libraries(resolver_test
-    PUBLIC zetasql re2 ${ICU_LIBS} protobuf ${ABSL_LIBS}
+    zetasql zetasql_public_templated_sql_tvf re2 ${ICU_LIBS} protobuf ${ABSL_LIBS}
     GTest::gtest GTest::gmock timeofday_proto date_proto
     )
