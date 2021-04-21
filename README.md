@@ -25,7 +25,7 @@ cmake sampel project integrated zetasql
 
   ```bash
   cmake -H. -Bbuild \
-      -DCMAKE_C_FLAGS:STRING="-std=c++11" \
+      -DCMAKE_C_FLAGS:STRING="${CFLAGS}" \
       -DCMAKE_CXX_FLAGS:STRING="${CXXFLAGS}" \
       -DCMAKE_EXE_LINKER_FLAGS:STRING="${LDFLAGS}" \
       -DCMAKE_INSTALL_LIBDIR=lib \
@@ -58,7 +58,7 @@ cmake sampel project integrated zetasql
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DBUILD_SHARED_LIBS=ON \
     -Dgtest_build_tests=ON \
-    -DCMAKE_CXX_FLAGS=-std=c++17
+    -DCMAKE_CXX_FLAGS=-std=c++11
    pushd build
    make -j$(nproc)
    sudo make install
