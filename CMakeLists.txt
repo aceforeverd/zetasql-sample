@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-set(CMAKE_CXX_FLAGS "-g -Wall -std=c++17")
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "-g -Wall -std=c++1z")
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # set the project name
@@ -40,7 +39,12 @@ link_directories(${CMAKE_SOURCE_DIR}/lib
                  ${CMAKE_SOURCE_DIR}/lib-external
                  ${CMAKE_SOURCE_DIR}/zetasql/bazel-bin/bazel/copy_flex/flex/lib
                  )
-
 add_executable(resolved_ast_test resolved_ast_test.cc)
-target_link_libraries(resolved_ast_test zetasql re2 ${ICU_LIBS} protobuf ${ABSL_LIBS}
+target_link_libraries(resolved_ast_test PUBLIC zetasql re2 ${ICU_LIBS} protobuf ${ABSL_LIBS}
                       GTest::gtest GTest::gmock timeofday_proto date_proto)
+
+add_executable(resolver_test ./resolver_test.cc)
+target_link_libraries(resolver_test
+    PUBLIC zetasql re2 ${ICU_LIBS} protobuf ${ABSL_LIBS}
+    GTest::gtest GTest::gmock timeofday_proto date_proto
+    )
