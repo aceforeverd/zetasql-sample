@@ -13,7 +13,8 @@ WIP
 + bazel compiled protobuf not work, I compiled myself
 + abseil compiled myself, since I'm using `find_package(absl)`
 + there are many shared library dependency in the final binary. checkout `objdump -p $binary | grep NEEDED`
-+ some zetasql package do not have archive, only shared library
++ some zetasql package do not have archive, only shared library, currently only 'tempated_sql_tvf.so'
+  - `tempated_sql_tvf` have cyclic dependency to other module
 + since zetasql compile with c++1z(aka c++17), we should upgrade to c++1z
 
 ## zetasql external dependency management
