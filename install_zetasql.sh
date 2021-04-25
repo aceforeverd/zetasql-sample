@@ -28,7 +28,9 @@ export -f install_gen_include_file
 export -f install_lib
 
 pushd zetasql/bazel-bin/
-find zetasql -maxdepth 4 -type f -iregex ".*/.*\.\(so\|a\)\$" -exec bash -c 'install_lib $0' {} \;
+# exlucde test so
+find zetasql -maxdepth 4 -type f -iname '*.so' -exec bash -c 'install_lib $0' {} \;
+find zetasql -type f -iname '*.a' -exec bash -c 'install_lib $0' {} \;
 
 pushd external
 find . -type f -iregex ".*/.*\.\(so\|a\)\$" -exec install -D {} "$ROOT/lib-external" \;
