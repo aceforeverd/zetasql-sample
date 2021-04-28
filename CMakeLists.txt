@@ -8,7 +8,7 @@ set(CMAKE_CXX_FLAGS
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-
+set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/thirdparty")
 set(DEPS_PREFIX "${CMAKE_SOURCE_DIR}/thirdparty")
 set(DEPS_BUILD_DIR
     "${CMAKE_SOURCE_DIR}/.deps/build"
@@ -37,25 +37,16 @@ ExternalProject_Add(
   BUILD_COMMAND ${MAKE_EXE} -j$(nproc)
   INSTALL_COMMAND ${MAKE_EXE} install)
 
-include_directories(
-        ${DEPS_PREFIX}/include
-        ${CMAKE_SOURCE_DIR}/include
-        ${CMAKE_SOURCE_DIR}zetasql/bazel-bin/bazel/copy_m4/m4/include
-        ${CMAKE_SOURCE_DIR}zetasql/bazel-bin/bazel/copy_flex/flex/include
-        /usr/local/include)
-link_directories(
-        ${DEPS_PREFIX}/lib
-        ${CMAKE_SOURCE_DIR}/lib
-        ${CMAKE_SOURCE_DIR}/lib-external
-        ${CMAKE_SOURCE_DIR}/zetasql/bazel-bin/bazel/copy_flex/flex/lib)
+include_directories(${DEPS_PREFIX}/include)
+link_directories(${DEPS_PREFIX}/lib)
 set(absl_DIR ${DEPS_PREFIX})
 find_package(absl REQUIRED)
-find_package(GTest CONFIG REQUIRED)
 list(
   APPEND
   ABSL_LIBS
   absl::algorithm
   absl::base
+        absl::cord
   absl::debugging
   absl::flat_hash_map
   absl::flags
@@ -72,37 +63,30 @@ list(
 
 list(APPEND ICU_LIBS icui18n icuio icuuc icudata)
 list(APPEND file_based_test_driver_LIBS
-        alternations
-#        test_case_options
-#        test_case_outputs
-        file_based_test_driver
-#        test_case_mode
-        logging
-        path
-        status
-        unified_diff_oss
-        ret_check
-        )
-#
-#link_libraries(
-#  zetasql
-#  re2
-#  ${ICU_LIBS}
-#  protobuf
-#  ${ABSL_LIBS}
-#  GTest::gtest
-#  GTest::gmock
-#  date_proto)
+    alternations
+    test_case_options
+    test_case_outputs
+    file_based_test_driver
+    test_case_mode
+    logging
+    path
+    status
+    unified_diff_oss
+    ret_check
+    )
 
+set(GTest_DIR ${DEPS_PREFIX}/gtest)
+find_package(GTest 1.10 EXACT REQUIRED)
+set(Protobuf_USE_STATIC_LIBS ON)
+find_package(Protobuf 3.6 EXACT REQUIRED)
+link_libraries(
+  zetasql
+  re2
+  ${ICU_LIBS}
+  ${Protobuf_LIBRARIES}
+  ${ABSL_LIBS}
+  ${GTEST_LIBRARIES}
+  gmock
+  date_proto)
 
 add_executable(parse_tree_test parse_tree_test.cc)
-target_link_libraries(parse_tree_test zetasql
-        re2
-        ${ICU_LIBS}
-        ${ABSL_LIBS}
-        ${file_based_test_driver_LIBS}
-        GTest::gtest
-        GTest::gmock
-        date_proto)
-add_test(parse_tree_test parse_tree_test --gtest_output=xml:${CMAKE_BINARY_DIR}/parse_tree_test.xml)
-list(APPEND test_list parse_tree_test)
