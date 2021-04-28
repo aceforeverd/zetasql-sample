@@ -9,37 +9,41 @@ set(CMAKE_CXX_FLAGS
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_BUILD_TYPE Release)
 
-set(DEPS_PREFIX "${CMAKE_SOURCE_DIR}/thirdparty")
-set(DEPS_BUILD_DIR
-    "${CMAKE_SOURCE_DIR}/.deps/build"
-    CACHE PATH "Dependencies build directory.")
-set(DEPS_DOWNLOAD_DIR
-    "${DEPS_BUILD_DIR}/downloads"
-    CACHE PATH "Dependencies download directory.")
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
-     ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+# Prefer our bundled versions of dependencies.
+if(DEFINED ENV{DEPS_BUILD_DIR})
+  set(DEPS_PREFIX "$ENV{DEPS_BUILD_DIR}/usr" CACHE PATH "Path prefix for finding dependencies")
+else()
+  set(DEPS_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/usr" CACHE PATH "Path prefix for finding dependencies")
+  # When running from within CLion or Visual Studio,
+  # build bundled dependencies automatically.
+  if(NOT EXISTS ${DEPS_PREFIX})
+    message(STATUS "Building dependencies...")
+    set(DEPS_BUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/build)
+    file(MAKE_DIRECTORY ${DEPS_BUILD_DIR})
+    execute_process(
+      COMMAND ${CMAKE_COMMAND} -G ${CMAKE_GENERATOR}
+        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+        -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
+        -DCMAKE_C_FLAGS_DEBUG=${CMAKE_C_FLAGS_DEBUG}
+        -DCMAKE_C_FLAGS_MINSIZEREL=${CMAKE_C_FLAGS_MINSIZEREL}
+        -DCMAKE_C_FLAGS_RELWITHDEBINFO=${CMAKE_C_FLAGS_RELWITHDEBINFO}
+        -DCMAKE_C_FLAGS_RELEASE=${CMAKE_C_FLAGS_RELEASE}
+        -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
+        ${PROJECT_SOURCE_DIR}/thirdparty
+      WORKING_DIRECTORY ${DEPS_BUILD_DIR})
+    execute_process(
+      COMMAND ${CMAKE_COMMAND} --build ${DEPS_BUILD_DIR} --config ${CMAKE_BUILD_TYPE})
+  endif()
+endif()
 
-include(ExternalProject)
-
-find_program(MAKE_EXE NAMES gmake nmake make)
-ExternalProject_Add(
-  protobuf
-  URL https://github.com/protocolbuffers/protobuf/archive/v3.6.1.3.tar.gz
-  URL_HASH
-    SHA256=73fdad358857e120fd0fa19e071a96e15c0f23bb25f85d3f7009abfd4f264a2a
-  PREFIX ${DEPS_BUILD_DIR}
-  DOWNLOAD_DIR ${DEPS_DOWNLOAD_DIR}/protobuf
-  INSTALL_DIR ${CMAKE_SOURCE_DIR}/thirdparty
-  BUILD_IN_SOURCE True
-  CONFIGURE_COMMAND ./autogen.sh && ./configure --prefix ${DEPS_PREFIX}
-                    --enable-shared=false CXXFLAGS=-std=c++11
-  BUILD_COMMAND ${MAKE_EXE} -j$(nproc)
-  INSTALL_COMMAND ${MAKE_EXE} install)
+set(CMAKE_PREFIX_PATH ${DEPS_PREFIX})
 
 find_package(absl REQUIRED)
-find_package(GTest CONFIG REQUIRED)
 list(
   APPEND
   ABSL_LIBS
@@ -72,16 +76,21 @@ link_directories(
   ${CMAKE_SOURCE_DIR}/lib-external
   ${CMAKE_SOURCE_DIR}/zetasql/bazel-bin/bazel/copy_flex/flex/lib)
 
+
+find_package(GTest REQUIRED)
+set(Protobuf_USE_STATIC_LIBS ON)
+find_package(Protobuf 3.6 EXACT REQUIRED)
+
 link_libraries(
   zetasql
   zetasql_public_templated_sql_tvf
   zetasql
   re2
   ${ICU_LIBS}
-  protobuf
+  ${Protobuf_LIBRARIES}
   ${ABSL_LIBS}
-  GTest::gtest
-  GTest::gmock
+  ${GTEST_LIBRARIES}
+  gmock
   timeofday_proto
   date_proto)
 
