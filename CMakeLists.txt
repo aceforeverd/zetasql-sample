@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.10)
 
 # set the project name
 project(zetasql-sample VERSION 0.1.0)
-
 set(CMAKE_CXX_FLAGS
     "-g -Wall -Wno-char-subscripts -Wno-return-type -Wno-sign-compare -Wno-switch -Wno-unused-but-set-parameter -Wno-unused-function -Wnonnull-compare"
 )
@@ -20,7 +19,7 @@ set(DEPS_DOWNLOAD_DIR
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
      ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-
+message(STATUS "PROJECT_SOURCE_DIR ${PROJECT_SOURCE_DIR}")
 include(ExternalProject)
 
 find_program(MAKE_EXE NAMES gmake nmake make)
@@ -38,6 +37,18 @@ ExternalProject_Add(
   BUILD_COMMAND ${MAKE_EXE} -j$(nproc)
   INSTALL_COMMAND ${MAKE_EXE} install)
 
+include_directories(
+        ${DEPS_PREFIX}/include
+        ${CMAKE_SOURCE_DIR}/include
+        ${CMAKE_SOURCE_DIR}zetasql/bazel-bin/bazel/copy_m4/m4/include
+        ${CMAKE_SOURCE_DIR}zetasql/bazel-bin/bazel/copy_flex/flex/include
+        /usr/local/include)
+link_directories(
+        ${DEPS_PREFIX}/lib
+        ${CMAKE_SOURCE_DIR}/lib
+        ${CMAKE_SOURCE_DIR}/lib-external
+        ${CMAKE_SOURCE_DIR}/zetasql/bazel-bin/bazel/copy_flex/flex/lib)
+set(absl_DIR ${DEPS_PREFIX})
 find_package(absl REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 list(
@@ -60,37 +71,38 @@ list(
   absl::utility)
 
 list(APPEND ICU_LIBS icui18n icuio icuuc icudata)
+list(APPEND file_based_test_driver_LIBS
+        alternations
+#        test_case_options
+#        test_case_outputs
+        file_based_test_driver
+#        test_case_mode
+        logging
+        path
+        status
+        unified_diff_oss
+        ret_check
+        )
+#
+#link_libraries(
+#  zetasql
+#  re2
+#  ${ICU_LIBS}
+#  protobuf
+#  ${ABSL_LIBS}
+#  GTest::gtest
+#  GTest::gmock
+#  date_proto)
 
-include_directories(
-  ${DEPS_PREFIX}/include
-  ${CMAKE_SOURCE_DIR}zetasql/bazel-bin/bazel/copy_m4/m4/include
-  ${CMAKE_SOURCE_DIR}zetasql/bazel-bin/bazel/copy_flex/flex/include
-  /usr/local/include)
-link_directories(
-  ${DEPS_PREFIX}/lib
-  /usr/local/lib
-  ${CMAKE_SOURCE_DIR}/lib-external
-  ${CMAKE_SOURCE_DIR}/zetasql/bazel-bin/bazel/copy_flex/flex/lib)
-
-link_libraries(
-  zetasql
-  zetasql_public_templated_sql_tvf
-  zetasql
-  re2
-  ${ICU_LIBS}
-  protobuf
-  ${ABSL_LIBS}
-  GTest::gtest
-  GTest::gmock
-  timeofday_proto
-  date_proto)
-
-add_executable(resolved_ast_test resolved_ast_test.cc)
-
-add_executable(resolver_test resolver_test.cc)
-
-add_executable(analyzer_test analyzer_test.cc)
 
 add_executable(parse_tree_test parse_tree_test.cc)
-
-add_executable(like_test like_test.cc)
+target_link_libraries(parse_tree_test zetasql
+        re2
+        ${ICU_LIBS}
+        ${ABSL_LIBS}
+        ${file_based_test_driver_LIBS}
+        GTest::gtest
+        GTest::gmock
+        date_proto)
+add_test(parse_tree_test parse_tree_test --gtest_output=xml:${CMAKE_BINARY_DIR}/parse_tree_test.xml)
+list(APPEND test_list parse_tree_test)
