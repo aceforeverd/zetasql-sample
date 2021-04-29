@@ -23,7 +23,7 @@ ExternalProject_Add(
   BUILD_IN_SOURCE True
   CONFIGURE_COMMAND ./autogen.sh && ./configure --prefix ${DEPS_PREFIX}
                     CXXFLAGS=-std=c++11
-  BUILD_COMMAND ${MAKE_EXE} -j$(nproc)
+  BUILD_COMMAND ${MAKE_EXE}
   INSTALL_COMMAND ${MAKE_EXE} install)
 
 ExternalProject_Add(
