@@ -6,9 +6,10 @@ set -eE
 
 cd "$(dirname "$0")"
 export ROOT=$(realpath .)
+export PREFIX="$ROOT/thirdparty/usr"
 
-rm -rf tmp-lib libzetasql.mri lib-external
-mkdir -p tmp-lib lib-external
+rm -rf tmp-lib libzetasql.mri
+mkdir -p tmp-lib
 
 install_lib() {
     local file
@@ -25,17 +26,34 @@ install_gen_include_file() {
     outfile=$(echo "$file" | sed -e 's/^.*proto\///')
     install -D "$file" "$ROOT/thirdparty/usr/include/$outfile"
 }
-export -f install_gen_include_file
 
+install_external_lib() {
+    local file
+    file=$1
+    local libname
+    libname=$(basename "$file")
+    install -D "$file" "$PREFIX/lib/$libname"
+}
+
+export -f install_gen_include_file
 export -f install_lib
+export -f install_external_lib
 
 pushd zetasql/bazel-bin/
 # exlucde test so
 find zetasql -maxdepth 4 -type f -iname '*.so' -exec bash -c 'install_lib $0' {} \;
 find zetasql -type f -iname '*.a' -exec bash -c 'install_lib $0' {} \;
 
+# external lib headers
+pushd "$(realpath .)/../../../../../external/com_googlesource_code_re2"
+find re2 -iname "*.h" -exec install -D {} "$PREFIX"/include/{} \;
+popd
+
+# external lib
 pushd external
-find . -type f -iregex ".*/.*\.\(so\|a\)\$" -exec install -D {} "$ROOT/lib-external" \;
+find icu -type f -iregex ".*/.*\.\(so\|a\)\$" -exec bash -c 'install_external_lib $0' {} \;
+find com_googlesource_code_re2 -type f -iregex ".*/.*\.\(so\|a\)\$" -exec bash -c 'install_external_lib $0' {} \;
+find com_googleapis_googleapis -type f -iname '*.so' -exec bash -c 'install_external_lib $0' {} \;
 popd
 
 # zetasql header files: protobuf generated files

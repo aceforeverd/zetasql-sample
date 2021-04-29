@@ -14,7 +14,7 @@ set(CMAKE_BUILD_TYPE Release)
 
 # Prefer our bundled versions of dependencies.
 if(DEFINED ENV{DEPS_BUILD_DIR})
-  set(DEPS_PREFIX "$ENV{DEPS_BUILD_DIR}/usr" CACHE PATH "Path prefix for finding dependencies")
+  set(DEPS_PREFIX "$ENV{DEPS_BUILD_DIR}" CACHE PATH "Path prefix for finding dependencies")
 else()
   set(DEPS_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/usr" CACHE PATH "Path prefix for finding dependencies")
   # When running from within CLion or Visual Studio,
@@ -69,11 +69,9 @@ include_directories(
   ${DEPS_PREFIX}/include
   ${CMAKE_SOURCE_DIR}zetasql/bazel-bin/bazel/copy_m4/m4/include
   ${CMAKE_SOURCE_DIR}zetasql/bazel-bin/bazel/copy_flex/flex/include
-  /usr/local/include)
+  )
 link_directories(
   ${DEPS_PREFIX}/lib
-  /usr/local/lib
-  ${CMAKE_SOURCE_DIR}/lib-external
   ${CMAKE_SOURCE_DIR}/zetasql/bazel-bin/bazel/copy_flex/flex/lib)
 
 
