@@ -57,3 +57,12 @@ ExternalProject_Add(
   BUILD_COMMAND ${CMAKE_COMMAND} --build .
   INSTALL_COMMAND ${CMAKE_COMMAND} --build . --target install)
 
+ExternalProject_Add(
+  zetasql
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../zetasql
+  BUILD_IN_SOURCE True
+  PREFIX ${DEPS_BUILD_DIR}
+  CONFIGURE_COMMAND ""
+  INSTALL_DIR ${DEPS_PREFIX}
+  BUILD_COMMAND bazel build //zetasql/...
+  INSTALL_COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/../install_zetasql.sh)
