@@ -12,6 +12,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/aceforeverd/hybridsql-base:0.0.1
     steps:
       - uses: actions/checkout@v2
         with:
@@ -21,6 +23,11 @@ jobs:
         run: |
           sudo curl --create-dirs -SLo /usr/local/bin/bazel https://github.com/bazelbuild/bazelisk/releases/download/v1.8.0/bazelisk-linux-amd64
           sudo chmod +x /usr/local/bin/bazel
+
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v1.8
+        with:
+          cmake-version: '3.20.x'
 
       - name: configure
         run: |
