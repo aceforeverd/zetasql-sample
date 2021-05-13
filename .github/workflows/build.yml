@@ -29,10 +29,20 @@ jobs:
         with:
           cmake-version: '3.20.x'
 
+      - name: download thirdparty
+        run: |
+          curl -SLo thirdparty.tar.gz https://github.com/aceforeverd/hybridsql-asserts/releases/download/v0.0.9/thirdparty-2021-05-12.tar.gz
+          tar xzf thirdparty.tar.gz
+          mv thirdparty-*/ thirdparty/
+
       - name: configure
+        env:
+          DEPS_BUILD_DIR: ${{ github.workspace }}/thirdparty
         run: |
           cmake -H. -Bbuild
 
       - name: compile
+        env:
+          DEPS_BUILD_DIR: ${{ github.workspace }}/thirdparty
         run: |
           cmake --build build -- -j$(nproc)

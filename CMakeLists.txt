@@ -92,12 +92,12 @@ link_libraries(
   timeofday_proto
   date_proto)
 
-add_executable(resolved_ast_test resolved_ast_test.cc)
+# add_executable(resolved_ast_test resolved_ast_test.cc)
 
-add_executable(resolver_test resolver_test.cc)
+# add_executable(resolver_test resolver_test.cc)
 
-add_executable(analyzer_test analyzer_test.cc)
+# add_executable(analyzer_test analyzer_test.cc)
 
 add_executable(parse_tree_test parse_tree_test.cc)
 
-add_executable(like_test like_test.cc)
+# add_executable(like_test like_test.cc)
