@@ -41,6 +41,7 @@ else()
   endif()
 endif()
 
+message("DEPS_PREFIX: ${DEPS_PREFIX}")
 set(CMAKE_PREFIX_PATH ${DEPS_PREFIX})
 
 find_package(absl REQUIRED)
