@@ -37,12 +37,12 @@ jobs:
 
       - name: configure
         env:
-          DEPS_BUILD_DIR: ${{ github.workspace }}/thirdparty
+          DEPS_BUILD_DIR: /__w/zetasql-sample/zetasql-sample/thirdparty
         run: |
           cmake -H. -Bbuild
 
       - name: compile
         env:
-          DEPS_BUILD_DIR: ${{ github.workspace }}/thirdparty
+          DEPS_BUILD_DIR: /__w/zetasql-sample/zetasql-sample/thirdparty
         run: |
           cmake --build build -- -j$(nproc)
