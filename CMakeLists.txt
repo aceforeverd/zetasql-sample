@@ -73,6 +73,7 @@ include_directories(
   )
 link_directories(
   ${DEPS_PREFIX}/lib
+  ${DEPS_PREFIX}/lib64
   ${CMAKE_SOURCE_DIR}/zetasql/bazel-bin/bazel/copy_flex/flex/lib)
 
 
@@ -82,16 +83,13 @@ find_package(Protobuf 3.6 EXACT REQUIRED)
 
 link_libraries(
   zetasql
-  zetasql_public_templated_sql_tvf
-  zetasql
   re2
   ${ICU_LIBS}
   ${Protobuf_LIBRARIES}
   ${ABSL_LIBS}
   ${GTEST_LIBRARIES}
   gmock
-  timeofday_proto
-  date_proto)
+  )
 
 # add_executable(resolved_ast_test resolved_ast_test.cc)
 

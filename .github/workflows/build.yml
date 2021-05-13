@@ -31,7 +31,7 @@ jobs:
 
       - name: download thirdparty
         run: |
-          curl -SLo thirdparty.tar.gz https://github.com/aceforeverd/hybridsql-asserts/releases/download/v0.0.9/thirdparty-2021-05-12.tar.gz
+          curl -SLo thirdparty.tar.gz https://github.com/aceforeverd/hybridsql-asserts/releases/download/v0.2.0-beta2/thirdparty-2021-05-13.tar.gz
           tar xzf thirdparty.tar.gz
           mv thirdparty-*/ thirdparty/
 
@@ -46,3 +46,7 @@ jobs:
           DEPS_BUILD_DIR: /__w/zetasql-sample/zetasql-sample/thirdparty
         run: |
           cmake --build build -- -j$(nproc)
+
+      - name: test
+        run: |
+          ./build/parse_tree_test
