@@ -33,11 +33,12 @@ jobs:
         run: |
           curl -SLo thirdparty.tar.gz https://github.com/aceforeverd/hybridsql-asserts/releases/download/v0.2.0-beta2/thirdparty-2021-05-13.tar.gz
           tar xzf thirdparty.tar.gz
-          mv thirdparty-*/ thirdparty/
+          mv thirdparty-*/ thirdparty/usr/
+          ls -al thirdparty/
 
       - name: configure
         env:
-          DEPS_BUILD_DIR: /__w/zetasql-sample/zetasql-sample/thirdparty
+          DEPS_BUILD_DIR: /__w/zetasql-sample/zetasql-sample/thirdparty/usr
         run: |
           cmake -H. -Bbuild
 
